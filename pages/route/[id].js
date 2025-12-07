@@ -86,10 +86,14 @@ export default function RoutePage() {
   const isNavigating = !showOverview && !isCompleted;
 
   return (
-    <div className={`min-h-screen bg-dark-bg relative ${isNavigating ? 'overflow-hidden' : ''}`}>
+    <div className={`min-h-screen bg-dark-bg relative ${isNavigating ? 'overflow-hidden flex flex-col' : ''}`}>
 
-      {/* Map Layer - Fullscreen during navigation */}
-      <div className={`fixed inset-0 transition-all duration-500 ease-in-out ${isNavigating ? 'z-10 h-full' : 'z-0 h-[40vh] sm:h-[50vh] mask-image-b'}`}>
+      {/* Map Layer */}
+      {/* If Navigating: Top 60%, If Overview: Top 40% */}
+      <div className={`
+        relative w-full transition-all duration-500 ease-in-out
+        ${isNavigating ? 'h-[60vh] z-0' : 'fixed inset-0 h-[40vh] sm:h-[50vh] z-0 mask-image-b'}
+      `}>
         <Map
           coordinates={route.coordinates}
           questions={route.questions}
@@ -102,26 +106,27 @@ export default function RoutePage() {
         )}
       </div>
 
-      {/* Main Content Interface */}
+      {/* Content Layer */}
+      {/* If Navigating: Bottom 40%, If Overview: Standard Scroll */}
       <div className={`
-        relative z-20 transition-all duration-500 ease-in-out
+        relative transition-all duration-500 ease-in-out z-10
         ${isNavigating
-          ? 'fixed bottom-0 left-0 right-0 p-4' // Floating Bottom Sheet
-          : 'pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto pb-32' // Standard Scroll View with padding
+          ? 'h-[40vh] bg-dark-bg border-t border-white/10 shadow-up-lg' // Fixed Bottom Sheet
+          : 'pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto pb-32 pointer-events-none' // passthrough for map
         }
       `}>
         <motion.div
-          layout // Enable layout animation
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          layout
           className={`
-            glass-card backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl
-            ${isNavigating ? 'rounded-3xl' : 'rounded-t-3xl min-h-[65vh]'}
-          `}
+             ${isNavigating
+              ? 'h-full w-full'
+              : 'glass-card backdrop-blur-xl border border-white/10 rounded-t-3xl min-h-[65vh] pointer-events-auto shadow-2xl'
+            }
+           `}
         >
-          <div className={`${isNavigating ? 'p-5' : 'p-6 sm:p-8'}`}>
+          <div className={`${isNavigating ? 'h-full flex flex-col' : 'p-6 sm:p-8'}`}>
 
-            {/* Header Actions - Compact version during nav */}
+            {/* Header Actions - Overview Only */}
             {!isNavigating && (
               <div className="flex justify-between items-center mb-6">
                 <Link href="/">
@@ -143,13 +148,6 @@ export default function RoutePage() {
               </div>
             )}
 
-            {/* Mode: Navigating Header (Back button floated on map maybe? Or simple X) */}
-            {isNavigating && (
-              <div className="absolute top-4 right-4 z-50">
-                {/* Optional close/minimize button could go here */}
-              </div>
-            )}
-
             <AnimatePresence mode="wait">
               {showCompletion ? (
                 <motion.div
@@ -158,12 +156,11 @@ export default function RoutePage() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-8"
                 >
-                  {/* Completion UI Same as before */}
+                  {/* Completion UI */}
                   <div className="w-20 h-20 bg-accent-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
                     <svg className="w-10 h-10 text-dark-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                   </div>
                   <h2 className="text-3xl font-bold text-white mb-2">Trasa dokončena!</h2>
-                  <p className="text-gray-400 mb-8">Skvělá práce, zvládl jsi to.</p>
 
                   <div className="grid grid-cols-2 gap-4 mb-8 mt-8">
                     <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
@@ -184,7 +181,7 @@ export default function RoutePage() {
               ) : showOverview ? (
                 <motion.div
                   key="overview"
-                  // ... Overview UI (Same) ...
+                  // ... Overview UI (Same)
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -198,7 +195,6 @@ export default function RoutePage() {
                       <div className="text-accent-primary font-bold text-lg">{route.length} km</div>
                       <div className="text-[10px] text-gray-500 uppercase">Délka</div>
                     </div>
-                    {/* ... other stats ... */}
                     <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
                       <div className="text-white font-bold text-lg">{route.duration}</div>
                       <div className="text-[10px] text-gray-500 uppercase">Čas</div>
@@ -221,48 +217,43 @@ export default function RoutePage() {
                   </button>
                 </motion.div>
               ) : (
-                /* QUIZ FLOW & NAVIGATION - Compact Mode */
+                /* QUIZ FLOW & NAVIGATION - Full Compact Mode */
                 <motion.div
                   key="quiz"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="max-h-[60vh] overflow-y-auto"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="h-full flex flex-col"
                 >
                   {isNearTarget ? (
-                    <>
-                      <div className="flex justify-between items-center mb-6">
-                        <h2 className="font-bold text-white">Otázka {currentQuestionIndex + 1}</h2>
-                        {/* Close/Minimize button could go here too */}
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="h-1.5 bg-white/10 rounded-full mb-6 overflow-hidden">
-                        <motion.div
-                          className="h-full bg-accent-primary rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${((currentQuestionIndex + 1) / route.questions.length) * 100}%` }}
+                    // UNLOCKED: Show Compact Quiz
+                    <div className="flex-1 overflow-y-auto p-4 pb-20">
+                      <div className="max-w-md mx-auto">
+                        <Quiz
+                          question={route.questions[currentQuestionIndex]}
+                          onAnswer={handleAnswer}
+                          isLastQuestion={currentQuestionIndex === route.questions.length - 1}
                         />
                       </div>
-
-                      <Quiz
-                        question={route.questions[currentQuestionIndex]}
-                        onAnswer={handleAnswer}
-                        isLastQuestion={currentQuestionIndex === route.questions.length - 1}
-                      />
-                    </>
+                    </div>
                   ) : (
-                    /* NAVIGATION MODE - Compact */
-                    <div className="flex items-center space-x-6">
-                      <div className="flex-1">
-                        <h2 className="text-lg font-bold text-white mb-1">Jdi na další bod</h2>
-                        <div className="text-sm text-gray-400">
-                          {distanceToNextPoint !== null ? `${distanceToNextPoint} metrů daleko` : 'Hledám signál...'}
-                        </div>
-                      </div>
+                    // LOCKED: Navigation View
+                    <div className="flex-1 flex flex-col justify-center items-center p-6 text-center">
+                      <h2 className="text-xl font-bold text-white mb-2">Jdi na bod {currentQuestionIndex + 1}</h2>
 
-                      <div className="bg-accent-primary/10 border border-accent-primary/20 rounded-2xl w-16 h-16 flex items-center justify-center flex-shrink-0 animate-pulse relative">
-                        <span className="text-xl font-bold text-accent-primary">{distanceToNextPoint || '?'}</span>
-                        <span className="text-[10px] absolute bottom-2 text-accent-primary/60">m</span>
+                      {distanceToNextPoint !== null ? (
+                        <div className="my-6">
+                          <div className="text-5xl font-bold text-accent-primary tracking-tighter mb-1">
+                            {distanceToNextPoint}
+                            <span className="text-lg font-medium text-accent-primary/60 ml-1">m</span>
+                          </div>
+                          <div className="text-xs text-gray-400 uppercase tracking-widest">Vzdálenost</div>
+                        </div>
+                      ) : (
+                        <div className="my-6 text-gray-500 animate-pulse">Hledám signál GPS...</div>
+                      )}
+
+                      <div className="text-sm text-gray-400 max-w-xs">
+                        Až dojdeš na místo, otázka se automaticky zobrazí.
                       </div>
                     </div>
                   )}
@@ -274,13 +265,13 @@ export default function RoutePage() {
         </motion.div>
       </div>
 
-      {/* Floating Back Button for Navigation Mode */}
+      {/* Floating Back Button (Top Left) */}
       {isNavigating && (
         <button
           onClick={() => setShowOverview(true)}
-          className="fixed top-6 left-4 z-50 p-3 bg-dark-bg/80 backdrop-blur-md border border-white/10 rounded-full text-white shadow-lg"
+          className="fixed top-6 left-4 z-20 p-3 bg-dark-bg/50 backdrop-blur-md border border-white/10 rounded-full text-white shadow-lg active:scale-95 transition-transform"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         </button>
       )}
     </div>
