@@ -1,165 +1,146 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Quiz({ question, onAnswer, isLastQuestion }) {
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  const handleSubmit = () => {
-    if (!selectedAnswer) return;
-
-    const correct = selectedAnswer === question.correctAnswer;
-    setIsCorrect(correct);
-    setShowFeedback(true);
-
-    if (correct) {
-      const currentPoints = parseInt(localStorage.getItem('totalPoints') || '0', 10);
-      const newPoints = currentPoints + question.points;
-      localStorage.setItem('totalPoints', newPoints.toString());
-      window.dispatchEvent(new Event('pointsUpdated'));
-    }
-  };
-
-  const handleNext = () => {
-    onAnswer(selectedAnswer, isCorrect);
-    setSelectedAnswer(null);
-    setShowFeedback(false);
+  // Reset state when question changes
+  useEffect(() => {
+    setSelectedOption(null);
+    setIsAnswered(false);
     setIsCorrect(false);
+  }, [question]);
+
+  const handleSubmit = () => {
+    if (!selectedOption) return;
+
+    const correct = selectedOption === question.correctAnswer;
+    setIsAnswered(true);
+    setIsCorrect(correct);
+
+    // Small delay before proceeding via callback
+    setTimeout(() => {
+      onAnswer(selectedOption, correct);
+    }, 1500);
   };
 
   return (
-    <div className="relative px-1">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={question.id}
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -20, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Question Header */}
-          <div className="mb-4">
-            <span className="text-[10px] font-bold text-accent-primary uppercase tracking-widest mb-1 block">
-              Otázka za {question.points} bodů
-            </span>
-            <h3 className="text-lg font-bold text-white leading-snug">
-              {question.question}
-            </h3>
+    <div className="h-full flex flex-col">
+      <div className="flex-1 flex flex-col justify-center">
+
+        {/* Question Card */}
+        <div className="adventure-card p-6 mb-4 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-2 h-full bg-accent-primary" />
+          <h3 className="text-xl font-black text-white ml-2 leading-tight">
+            {question.question}
+          </h3>
+          <div className="mt-2 ml-2 flex items-center text-xs font-bold text-accent-secondary uppercase tracking-widest">
+            <span>{question.points} XP</span>
           </div>
-
-          {/* Options Grid */}
-          <div className="space-y-2">
-            {question.options.map((option) => {
-              const isSelected = selectedAnswer === option.id;
-              const isCorrectOption = option.id === question.correctAnswer;
-
-              let backgroundColor = "bg-white/5";
-              let borderColor = "border-white/10";
-              let textColor = "text-gray-300";
-
-              if (showFeedback) {
-                if (isCorrectOption) {
-                  backgroundColor = "bg-accent-secondary/20";
-                  borderColor = "border-accent-secondary";
-                  textColor = "text-accent-secondary";
-                } else if (isSelected && !isCorrect) {
-                  backgroundColor = "bg-accent-primary/20";
-                  borderColor = "border-accent-primary";
-                  textColor = "text-accent-primary";
-                } else {
-                  textColor = "text-gray-500 opacity-50";
-                }
-              } else if (isSelected) {
-                backgroundColor = "bg-accent-primary/20";
-                borderColor = "border-accent-primary";
-                textColor = "text-white";
-              }
-
-              return (
-                <motion.button
-                  key={option.id}
-                  whileTap={!showFeedback ? { scale: 0.98 } : {}}
-                  onClick={() => !showFeedback && setSelectedAnswer(option.id)}
-                  disabled={showFeedback}
-                  className={`w-full text-left p-3 rounded-xl border ${borderColor} ${backgroundColor} ${textColor} transition-all duration-200 relative overflow-hidden group`}
-                >
-                  <div className="flex items-center">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 border ${showFeedback && isCorrectOption ? 'border-accent-secondary text-accent-secondary' :
-                      isSelected ? 'border-accent-primary text-accent-primary bg-accent-primary/10' :
-                        'border-white/20 text-gray-400'
-                      }`}>
-                      {option.id.toUpperCase()}
-                    </span>
-                    <span className="font-medium text-sm">{option.text}</span>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Feedback Overlay with Animation */}
-      <AnimatePresence>
-        {showFeedback && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="mt-4 pt-4 border-t border-white/10"
-          >
-            <div className={`p-3 rounded-xl mb-3 flex items-start gap-3 ${isCorrect ? 'bg-accent-secondary/10 border border-accent-secondary/20' : 'bg-accent-primary/10 border border-accent-primary/20'
-              }`}>
-              <div className={`p-1.5 rounded-full ${isCorrect ? 'bg-accent-secondary text-dark-bg' : 'bg-accent-primary text-white'}`}>
-                {isCorrect ? (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                )}
-              </div>
-              <div>
-                <h4 className={`font-bold text-sm mb-0.5 ${isCorrect ? 'text-accent-secondary' : 'text-accent-primary'}`}>
-                  {isCorrect ? 'Správně!' : 'Špatně!'}
-                </h4>
-                <p className="text-xs text-gray-300">
-                  {isCorrect
-                    ? `Výborně! Přičítáme ${question.points} bodů.`
-                    : `Správná: ${question.correctAnswer.toUpperCase()}`
-                  }
-                </p>
-              </div>
-            </div>
-
-            <motion.button
-              onClick={handleNext}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-3 bg-white text-dark-bg font-bold rounded-xl shadow-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm"
-            >
-              <span>{isLastQuestion ? 'Dokončit kvíz' : 'Další otázka'}</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Submit Button (only visible before feedback) */}
-      {!showFeedback && (
-        <div className="mt-4">
-          <motion.button
-            onClick={handleSubmit}
-            disabled={!selectedAnswer}
-            whileTap={selectedAnswer ? { scale: 0.98 } : {}}
-            className={`w-full py-3 rounded-xl font-bold transition-all duration-200 text-sm ${selectedAnswer
-              ? 'bg-accent-primary text-white shadow-lg shadow-accent-primary/25'
-              : 'bg-white/10 text-gray-500 cursor-not-allowed'
-              }`}
-          >
-            Odeslat odpověď
-          </motion.button>
         </div>
-      )}
+
+        {/* Options */}
+        <div className="space-y-3">
+          {question.options.map((option) => {
+            const isSelected = selectedOption === option.id;
+            // Determined styles based on state
+            let btnClass = "w-full p-4 rounded-xl border-2 font-bold text-left transition-all relative overflow-hidden flex items-center justify-between group ";
+
+            if (isAnswered) {
+              if (option.id === question.correctAnswer) {
+                btnClass += "bg-green-500/20 border-green-500 text-white";
+              } else if (isSelected) {
+                btnClass += "bg-red-500/20 border-red-500 text-white";
+              } else {
+                btnClass += "border-white/5 text-gray-500 opacity-50";
+              }
+            } else {
+              if (isSelected) {
+                btnClass += "bg-accent-primary/20 border-accent-primary text-white shadow-[0_0_15px_rgba(248,113,113,0.3)]";
+              } else {
+                btnClass += "bg-[#1e293b] border-white/10 text-gray-300 hover:bg-white/5 hover:border-white/30";
+              }
+            }
+
+            return (
+              <motion.button
+                key={option.id}
+                whileTap={!isAnswered ? { scale: 0.98 } : {}}
+                onClick={() => !isAnswered && setSelectedOption(option.id)}
+                className={btnClass}
+                disabled={isAnswered}
+              >
+                <div className="flex items-center gap-3 relative z-10">
+                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border-2 ${isAnswered
+                      ? (option.id === question.correctAnswer ? 'border-green-500 text-green-500' : isSelected ? 'border-red-500 text-red-500' : 'border-gray-600 text-gray-600')
+                      : (isSelected ? 'border-accent-primary text-accent-primary bg-accent-primary/10' : 'border-gray-600 text-gray-400')
+                    }`}>
+                    {option.id.toUpperCase()}
+                  </span>
+                  <span>{option.text}</span>
+                </div>
+
+                {/* Status Icons */}
+                {isAnswered && option.id === question.correctAnswer && (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                    <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  </motion.div>
+                )}
+                {isAnswered && isSelected && option.id !== question.correctAnswer && (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                    <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </motion.div>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Action Area */}
+      <div className="pt-4 mt-auto min-h-[80px]">
+        <AnimatePresence mode="wait">
+          {!isAnswered ? (
+            <motion.div
+              key="submit-btn"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+            >
+              <button
+                onClick={handleSubmit}
+                disabled={!selectedOption}
+                className={`mission-btn w-full py-4 rounded-2xl text-lg tracking-widest transition-all ${!selectedOption ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'}`}
+              >
+                ODESLAT ODPOVĚĎ
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="result-msg"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`text-center p-4 rounded-2xl border ${isCorrect ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50'}`}
+            >
+              <span className={`text-xl font-black uppercase flex items-center justify-center gap-2 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                {isCorrect ? (
+                  <>
+                    <span>+ {question.points} XP</span>
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  </>
+                ) : (
+                  <>
+                    <span>ŠPATNĚ...</span>
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </>
+                )}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

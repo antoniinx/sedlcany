@@ -157,24 +157,31 @@ export default function RoutePage() {
                   className="text-center py-8"
                 >
                   {/* Completion UI */}
-                  <div className="w-20 h-20 bg-accent-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
-                    <svg className="w-10 h-10 text-dark-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <div className="w-24 h-24 bg-gradient-to-br from-accent-secondary to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl rotate-3 border-4 border-white/10">
+                    <span className="text-4xl">🏆</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-2">Trasa dokončena!</h2>
+                  <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-wide">MISE SPLNĚNA!</h2>
+                  <p className="text-gray-400 font-medium">Skvělá práce, agente!</p>
 
                   <div className="grid grid-cols-2 gap-4 mb-8 mt-8">
-                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                      <div className="text-2xl font-bold text-accent-secondary">{trailPoints}</div>
-                      <div className="text-xs text-gray-400 uppercase tracking-widest">Body</div>
+                    <div className="adventure-card p-4 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      </div>
+                      <div className="text-3xl font-black text-accent-secondary">{trailPoints}</div>
+                      <div className="text-[10px] text-gray-400 uppercase font-black tracking-widest">ZÍSKANÉ XP</div>
                     </div>
-                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                      <div className="text-2xl font-bold text-white">{Math.round((answers.filter(a => a.isCorrect).length / route.questions.length) * 100)}%</div>
-                      <div className="text-xs text-gray-400 uppercase tracking-widest">Úspěšnost</div>
+                    <div className="adventure-card p-4 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+                      </div>
+                      <div className="text-3xl font-black text-white">{Math.round((answers.filter(a => a.isCorrect).length / route.questions.length) * 100)}%</div>
+                      <div className="text-[10px] text-gray-400 uppercase font-black tracking-widest">PŘESNOST</div>
                     </div>
                   </div>
                   <Link href="/">
-                    <button className="w-full py-4 bg-accent-primary text-white rounded-xl font-bold uppercase shadow-lg shadow-accent-primary/25 hover:bg-red-500 transition-colors">
-                      Další trasa
+                    <button className="mission-btn w-full py-4 text-white rounded-xl font-bold uppercase shadow-lg shadow-accent-primary/25 hover:bg-red-500 transition-colors text-lg">
+                      ZPĚT NA ZÁKLADNU
                     </button>
                   </Link>
                 </motion.div>
@@ -186,74 +193,67 @@ export default function RoutePage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="pb-8"
                 >
-                  <div className="flex justify-between items-start mb-2 hidden sm:flex">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/10 ${route.difficulty === 'Lehká' ? 'text-green-400' :
-                      route.difficulty === 'Střední' ? 'text-yellow-400' :
-                        'text-red-400'
-                      }`}>
-                      {route.difficulty}
+                  <div className="flex justify-between items-start mb-4 hidden sm:flex">
+                    <span className="level-badge px-3 py-1 rounded-full text-xs">
+                      MISE #{route.id}
                     </span>
                   </div>
 
-                  <h1 className="text-4xl font-extrabold text-white mb-4 leading-none tracking-tight">{route.name}</h1>
-                  <p className="text-gray-400 leading-relaxed mb-8 text-sm">{route.description}</p>
+                  <h1 className="text-4xl font-black text-white mb-2 leading-none tracking-tight shadow-text">{route.name}</h1>
+                  <p className="text-gray-400 leading-relaxed mb-8 text-sm font-medium">{route.description}</p>
 
-                  {/* Sports Stats Grid */}
-                  <div className="grid grid-cols-3 gap-6 mb-8 border-y border-white/5 py-6">
-                    <div>
-                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Vzdálenost</div>
-                      <div className="text-3xl font-black text-white flex items-baseline">
+                  {/* Mission Stats Grid */}
+                  <div className="adventure-card p-6 mb-8 grid grid-cols-3 gap-6 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                    <div className="text-center relative">
+                      <div className="text-gray-500 text-[10px] font-black uppercase tracking-wider mb-1">CÍL</div>
+                      <div className="text-2xl font-black text-white flex justify-center items-baseline">
                         {route.length}
                         <span className="text-sm font-bold text-gray-500 ml-1">km</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Čas</div>
-                      <div className="text-3xl font-black text-white flex items-baseline">
+
+                    <div className="text-center border-l border-white/10 relative">
+                      <div className="text-gray-500 text-[10px] font-black uppercase tracking-wider mb-1">LIMIT</div>
+                      <div className="text-2xl font-black text-white flex justify-center items-baseline">
                         {route.duration.split(' ')[0]}
                         <span className="text-sm font-bold text-gray-500 ml-1">h</span>
                       </div>
                     </div>
-                    <div>
-                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Výstup</div>
-                      <div className="text-3xl font-black text-accent-primary flex items-baseline">
+
+                    <div className="text-center border-l border-white/10 relative">
+                      <div className="text-gray-500 text-[10px] font-black uppercase tracking-wider mb-1">VÝSTUP</div>
+                      <div className="text-2xl font-black text-accent-primary flex justify-center items-baseline">
                         {route.elevationGain || 120}
                         <span className="text-sm font-bold text-gray-500 ml-1">m</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Elevation Profile */}
+                  {/* Elevation Profile - Adventure Style */}
                   {route.elevationProfile && (
                     <div className="mb-8">
                       <div className="flex justify-between items-end mb-4">
-                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Výškový profil</h3>
-                        <span className="text-xs text-gray-500 font-mono">MAX {Math.max(...route.elevationProfile.map(p => p.elevation))}m</span>
+                        <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                          <svg className="w-4 h-4 text-accent-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                          TERÉN MISE
+                        </h3>
+                        <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-white">MAX {Math.max(...route.elevationProfile.map(p => p.elevation))}m</span>
                       </div>
-                      <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
-                        <ElevationProfile profile={route.elevationProfile} color="#FE3B30" />
+                      <div className="adventure-card p-4">
+                        <ElevationProfile profile={route.elevationProfile} color="#fbbf24" />
                       </div>
                     </div>
                   )}
 
-                  {/* Info Badges */}
-                  <div className="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                    <div className="flex items-center px-4 py-2 bg-white/5 rounded-full border border-white/5 whitespace-nowrap">
-                      <span className="text-accent-secondary font-bold mr-2">{route.questions.length}</span>
-                      <span className="text-xs text-gray-400 uppercase font-bold">Otázek</span>
-                    </div>
-                    <div className="flex items-center px-4 py-2 bg-white/5 rounded-full border border-white/5 whitespace-nowrap">
-                      <span className="text-white font-bold mr-2">{route.reward}</span>
-                      <span className="text-xs text-gray-400 uppercase font-bold">Bodů</span>
-                    </div>
-                  </div>
-
                   <button
                     onClick={() => setShowOverview(false)}
-                    className="w-full py-5 bg-accent-primary text-white rounded-xl font-bold text-xl uppercase shadow-xl shadow-accent-primary/20 hover:bg-red-500 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="mission-btn w-full py-5 text-xl flex items-center justify-center gap-3 group relative overflow-hidden"
                   >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Spustit trasu
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    ZAČÍT MISI
                   </button>
                 </motion.div>
               ) : (
@@ -276,24 +276,40 @@ export default function RoutePage() {
                       </div>
                     </div>
                   ) : (
-                    // LOCKED: Navigation View
-                    <div className="flex-1 flex flex-col justify-center items-center p-6 text-center">
-                      <h2 className="text-xl font-bold text-white mb-2">Jdi na bod {currentQuestionIndex + 1}</h2>
+                    // LOCKED: Navigation View (HUD)
+                    <div className="flex-1 flex flex-col justify-center items-center p-6 text-center relative overflow-hidden">
+                      {/* Background pulse effect */}
+                      <div className="absolute inset-0 bg-accent-primary/5 animate-pulse pointer-events-none" />
 
-                      {distanceToNextPoint !== null ? (
-                        <div className="my-6">
-                          <div className="text-5xl font-bold text-accent-primary tracking-tighter mb-1">
-                            {distanceToNextPoint}
-                            <span className="text-lg font-medium text-accent-primary/60 ml-1">m</span>
+                      <div className="adventure-card p-6 w-full max-w-sm relative z-10 border-accent-primary/30">
+                        <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 flex justify-center items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-accent-secondary animate-ping" />
+                          NAVIGACE K BODU {currentQuestionIndex + 1}
+                        </h2>
+
+                        {distanceToNextPoint !== null ? (
+                          <div className="my-2">
+                            <div className="text-6xl font-black text-white tracking-tighter drop-shadow-lg tabular-nums">
+                              {distanceToNextPoint}
+                            </div>
+                            <div className="text-xs font-bold text-accent-primary uppercase tracking-[0.2em] mt-2">METRŮ K CÍLI</div>
                           </div>
-                          <div className="text-xs text-gray-400 uppercase tracking-widest">Vzdálenost</div>
-                        </div>
-                      ) : (
-                        <div className="my-6 text-gray-500 animate-pulse">Hledám signál GPS...</div>
-                      )}
+                        ) : (
+                          <div className="my-8 text-gray-500 animate-pulse font-mono text-sm">HLEDÁM GPS SIGNÁL...</div>
+                        )}
 
-                      <div className="text-sm text-gray-400 max-w-xs">
-                        Až dojdeš na místo, otázka se automaticky zobrazí.
+                        <div className="mt-6 w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-accent-primary"
+                            initial={{ width: "0%" }}
+                            animate={{ width: distanceToNextPoint ? `${Math.min(100, Math.max(0, 100 - (distanceToNextPoint / 500) * 100))}%` : "0%" }}
+                            transition={{ type: "spring", stiffness: 50 }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-8 text-sm text-gray-400 max-w-xs font-medium bg-dark-bg/80 px-4 py-2 rounded-full backdrop-blur-sm border border-white/5">
+                        📍 Doraz na místo a odemkni další část příběhu.
                       </div>
                     </div>
                   )}
