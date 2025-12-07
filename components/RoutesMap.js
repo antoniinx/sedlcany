@@ -130,7 +130,7 @@ export default function RoutesMap({ routes = [], userLocation }) {
 
                     return (
                         <div key={route.id}>
-                            <RealRoutePolyline route={route} />
+                            {/* <RealRoutePolyline route={route} /> */}
 
                             <Marker position={startPoint} icon={createCustomIcon('route', (i + 1).toString())}>
                                 <Popup>

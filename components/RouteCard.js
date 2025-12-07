@@ -28,16 +28,23 @@ export default function RouteCard({ route }) {
         <div className="flex flex-col md:flex-row">
 
           {/* Left: Illustrative / Visual Side */}
-          <div className="h-40 md:h-auto md:w-1/3 bg-slate-700 relative overflow-hidden">
-            {/* Abstract Map/Terrain Pattern */}
-            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/topography.png')]" />
-
-            {/* Character/Icon Placeholder - Can be replaced with specific SVGs per route later */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className={`w-20 h-20 rounded-full border-4 ${difficultyColor} flex items-center justify-center bg-slate-800 shadow-xl`}>
-                <span className="text-3xl">🏁</span>
-              </div>
-            </div>
+          <div className="h-40 md:h-auto md:w-1/3 bg-slate-700 relative overflow-hidden group-hover:scale-105 transition-transform duration-700">
+            {route.image ? (
+              <img
+                src={route.image}
+                alt={route.name}
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+              />
+            ) : (
+              <>
+                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/topography.png')]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className={`w-20 h-20 rounded-full border-4 ${difficultyColor} flex items-center justify-center bg-slate-800 shadow-xl`}>
+                    <span className="text-3xl">🏁</span>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Completed Badge */}
             {completionRate !== null && (
