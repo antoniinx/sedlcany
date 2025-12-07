@@ -10,6 +10,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isTestingMode, setIsTestingMode] = useState(false);
     const router = useRouter();
 
     // Load user from session on mount
@@ -99,7 +100,9 @@ export function AuthProvider({ children }) {
         login,
         logout,
         updateUserProgress,
-        loading
+        loading,
+        isTestingMode,
+        toggleTestingMode: () => setIsTestingMode(prev => !prev)
     };
 
     return (

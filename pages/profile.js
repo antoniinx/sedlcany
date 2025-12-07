@@ -6,7 +6,7 @@ import { routes } from '../data/routes';
 import Link from 'next/link';
 
 export default function Profile() {
-    const { currentUser, logout, loading } = useAuth();
+    const { currentUser, logout, loading, isTestingMode, toggleTestingMode } = useAuth();
     const router = useRouter();
 
     // Protect route
@@ -43,12 +43,23 @@ export default function Profile() {
                     <h1 className="text-3xl font-bold text-white mb-1">{currentUser.name}</h1>
                     <p className="text-gray-400 text-sm mb-4">{currentUser.email}</p>
 
-                    <button
-                        onClick={logout}
-                        className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold uppercase tracking-wider text-gray-300 transition-colors"
-                    >
-                        Odhlásit se
-                    </button>
+                    <div className="flex justify-center gap-3">
+                        <button
+                            onClick={logout}
+                            className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-bold uppercase tracking-wider text-gray-300 transition-colors"
+                        >
+                            Odhlásit se
+                        </button>
+                        <button
+                            onClick={toggleTestingMode}
+                            className={`px-6 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${isTestingMode
+                                ? 'bg-accent-primary text-white border-accent-primary shadow-glow'
+                                : 'bg-white/5 hover:bg-white/10 border-white/10 text-gray-500'
+                                }`}
+                        >
+                            Testování: {isTestingMode ? 'ON' : 'OFF'}
+                        </button>
+                    </div>
                 </motion.div>
 
                 {/* Stats Grid */}

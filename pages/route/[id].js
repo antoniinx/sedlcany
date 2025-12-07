@@ -21,7 +21,7 @@ export default function RoutePage() {
   const [trailPoints, setTrailPoints] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
-  const { updateUserProgress } = useAuth();
+  const { updateUserProgress, isTestingMode } = useAuth();
 
   // Geolocation
   const { location, error: geoError } = useGeolocation();
@@ -41,16 +41,22 @@ export default function RoutePage() {
 
   // Check distance to current question target
   useEffect(() => {
-    if (route && location && !showOverview && !isCompleted) {
+    if (route && (location || isTestingMode) && !showOverview && !isCompleted) {
+      if (isTestingMode) {
+        setIsNearTarget(true);
+        setDistanceToNextPoint(0);
+        return;
+      }
+
       const currentTarget = route.questions[currentQuestionIndex]?.coordinates;
-      if (currentTarget) {
+      if (currentTarget && location) {
         const dist = calculateDistance(location.lat, location.lng, currentTarget[0], currentTarget[1]);
         setDistanceToNextPoint(dist);
         // Unlock if closer than 50 meters
         setIsNearTarget(dist <= 50);
       }
     }
-  }, [route, location, showOverview, currentQuestionIndex, isCompleted]);
+  }, [route, location, showOverview, currentQuestionIndex, isCompleted, isTestingMode]);
 
 
   const handleAnswer = (selectedAnswer, isCorrect) => {
