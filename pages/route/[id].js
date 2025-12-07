@@ -181,38 +181,78 @@ export default function RoutePage() {
               ) : showOverview ? (
                 <motion.div
                   key="overview"
-                  // ... Overview UI (Same)
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, x: -20 }}
+                  className="pb-8"
                 >
-                  <h1 className="text-3xl font-bold text-white mb-4 leading-tight">{route.name}</h1>
-                  <p className="text-gray-300 leading-relaxed mb-6 text-lg">{route.description}</p>
+                  <div className="flex justify-between items-start mb-2 hidden sm:flex">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/10 ${route.difficulty === 'Lehká' ? 'text-green-400' :
+                      route.difficulty === 'Střední' ? 'text-yellow-400' :
+                        'text-red-400'
+                      }`}>
+                      {route.difficulty}
+                    </span>
+                  </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                      <div className="text-accent-primary font-bold text-lg">{route.length} km</div>
-                      <div className="text-[10px] text-gray-500 uppercase">Délka</div>
+                  <h1 className="text-4xl font-extrabold text-white mb-4 leading-none tracking-tight">{route.name}</h1>
+                  <p className="text-gray-400 leading-relaxed mb-8 text-sm">{route.description}</p>
+
+                  {/* Sports Stats Grid */}
+                  <div className="grid grid-cols-3 gap-6 mb-8 border-y border-white/5 py-6">
+                    <div>
+                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Vzdálenost</div>
+                      <div className="text-3xl font-black text-white flex items-baseline">
+                        {route.length}
+                        <span className="text-sm font-bold text-gray-500 ml-1">km</span>
+                      </div>
                     </div>
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                      <div className="text-white font-bold text-lg">{route.duration}</div>
-                      <div className="text-[10px] text-gray-500 uppercase">Čas</div>
+                    <div>
+                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Čas</div>
+                      <div className="text-3xl font-black text-white flex items-baseline">
+                        {route.duration.split(' ')[0]}
+                        <span className="text-sm font-bold text-gray-500 ml-1">h</span>
+                      </div>
                     </div>
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                      <div className="text-accent-secondary font-bold text-lg">{route.reward}</div>
-                      <div className="text-[10px] text-gray-500 uppercase">Body</div>
+                    <div>
+                      <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-1">Výstup</div>
+                      <div className="text-3xl font-black text-accent-primary flex items-baseline">
+                        {route.elevationGain || 120}
+                        <span className="text-sm font-bold text-gray-500 ml-1">m</span>
+                      </div>
                     </div>
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                      <div className="text-white font-bold text-lg">{route.questions.length}</div>
-                      <div className="text-[10px] text-gray-500 uppercase">Otázky</div>
+                  </div>
+
+                  {/* Elevation Profile */}
+                  {route.elevationProfile && (
+                    <div className="mb-8">
+                      <div className="flex justify-between items-end mb-4">
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Výškový profil</h3>
+                        <span className="text-xs text-gray-500 font-mono">MAX {Math.max(...route.elevationProfile.map(p => p.elevation))}m</span>
+                      </div>
+                      <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                        <ElevationProfile profile={route.elevationProfile} color="#FE3B30" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Info Badges */}
+                  <div className="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                    <div className="flex items-center px-4 py-2 bg-white/5 rounded-full border border-white/5 whitespace-nowrap">
+                      <span className="text-accent-secondary font-bold mr-2">{route.questions.length}</span>
+                      <span className="text-xs text-gray-400 uppercase font-bold">Otázek</span>
+                    </div>
+                    <div className="flex items-center px-4 py-2 bg-white/5 rounded-full border border-white/5 whitespace-nowrap">
+                      <span className="text-white font-bold mr-2">{route.reward}</span>
+                      <span className="text-xs text-gray-400 uppercase font-bold">Bodů</span>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setShowOverview(false)}
-                    className="w-full py-4 bg-accent-primary text-white rounded-xl font-bold text-lg uppercase shadow-lg shadow-accent-primary/25 hover:bg-red-500 transition-all active:scale-95"
+                    className="w-full py-5 bg-accent-primary text-white rounded-xl font-bold text-xl uppercase shadow-xl shadow-accent-primary/20 hover:bg-red-500 transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     Spustit trasu
                   </button>
                 </motion.div>

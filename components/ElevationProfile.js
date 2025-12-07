@@ -1,82 +1,60 @@
-export default function ElevationProfile({ profile, totalLength }) {
-  if (!profile || profile.length === 0) {
-    return (
-      <div className="w-full h-32 bg-dark-bg border border-dark-border rounded-xl flex items-center justify-center">
-        <p className="text-gray-400 text-sm">Žádná data o výškovém profilu</p>
-      </div>
-    );
-  }
+export default function ElevationProfile({ profile, color = "#ff3b30" }) {
+  if (!profile || profile.length < 2) return null;
 
-  const maxElevation = Math.max(...profile.map(p => p.elevation));
-  const minElevation = Math.min(...profile.map(p => p.elevation));
-  const elevationRange = maxElevation - minElevation || 1;
-  const maxDistance = totalLength || profile[profile.length - 1].distance;
+  const width = 100;
+  const height = 40;
+  const padding = 2; // Keep content away from very edges
 
-  // Calculate points for SVG path
-  const points = profile.map((point, index) => {
-    const x = (point.distance / maxDistance) * 100;
-    const y = 100 - ((point.elevation - minElevation) / elevationRange) * 80; // 80% of height for padding
-    return `${x},${y}`;
-  }).join(' ');
+  const minEle = Math.min(...profile.map(p => p.elevation));
+  const maxEle = Math.max(...profile.map(p => p.elevation));
+  const eleRange = maxEle - minEle || 1; // Prevent division by zero
 
-  // Create area path for fill
-  const areaPath = `M 0,100 L ${points} L 100,100 Z`;
+  const maxDist = profile[profile.length - 1].distance;
+
+  // Helper to map values to SVG coordinates
+  // X: 0 -> width
+  // Y: height -> 0 (because SVG Y is down)
+  const getX = (dist) => (dist / maxDist) * (width - 2 * padding) + padding;
+  const getY = (ele) => height - padding - ((ele - minEle) / eleRange) * (height - 2 * padding);
+
+  // Build points for the line
+  let d = `M ${getX(profile[0].distance)} ${getY(profile[0].elevation)}`;
+
+  profile.forEach((p, i) => {
+    if (i === 0) return;
+    // Smoother curves could be done with bezier, but straight lines are fine for accurate sports data
+    d += ` L ${getX(p.distance)} ${getY(p.elevation)}`;
+  });
+
+  // Build area (close the loop down to bottom)
+  const areaD = `${d} L ${getX(maxDist)} ${height} L ${getX(0)} ${height} Z`;
 
   return (
-    <div className="w-full bg-dark-bg border border-dark-border rounded-xl p-4">
-      <div className="relative w-full h-32">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="w-full h-full"
-        >
-          {/* Grid lines */}
-          {[0, 25, 50, 75, 100].map((y) => (
-            <line
-              key={y}
-              x1="0"
-              y1={y}
-              x2="100"
-              y2={y}
-              stroke="#3a3a3a"
-              strokeWidth="0.5"
-            />
-          ))}
-          {/* Elevation area */}
-          <path
-            d={areaPath}
-            fill="url(#elevationGradient)"
-            opacity="0.3"
-          />
-          {/* Elevation line */}
-          <polyline
-            points={points}
-            fill="none"
-            stroke="#ff3b30"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {/* Gradient definition */}
-          <defs>
-            <linearGradient id="elevationGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#ff3b30" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#ff3b30" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-        </svg>
-        {/* Elevation labels */}
-        <div className="absolute top-2 left-2 text-xs font-semibold text-white">
-          {maxElevation}m
-        </div>
-        <div className="absolute bottom-2 left-2 text-xs font-semibold text-gray-400">
-          {minElevation}m
-        </div>
-        <div className="absolute bottom-2 right-2 text-xs font-semibold text-gray-400">
-          {maxDistance.toFixed(1)} km
-        </div>
-      </div>
+    <div className="w-full h-24 relative">
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full h-full overflow-visible">
+        {/* Gradient Definition */}
+        <defs>
+          <linearGradient id={`grad-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: color, stopOpacity: 0.4 }} />
+            <stop offset="100%" style={{ stopColor: color, stopOpacity: 0.0 }} />
+          </linearGradient>
+        </defs>
+
+        {/* Fill Area */}
+        <path d={areaD} fill={`url(#grad-${color})`} stroke="none" />
+
+        {/* Stroke Line */}
+        <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+
+        {/* Start/End Dots */}
+        <circle cx={getX(0)} cy={getY(profile[0].elevation)} r="1.5" fill={color} />
+        <circle cx={getX(maxDist)} cy={getY(profile[profile.length - 1].elevation)} r="1.5" fill={color} />
+
+      </svg>
+
+      {/* Labels */}
+      <div className="absolute top-0 right-0 text-[10px] font-bold text-gray-400">{maxEle} m</div>
+      <div className="absolute bottom-0 right-0 text-[10px] font-bold text-gray-400">{minEle} m</div>
     </div>
   );
 }
-

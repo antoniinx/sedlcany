@@ -14,6 +14,7 @@ export const routes = [
       { distance: 3, elevation: 370 },
       { distance: 4.7, elevation: 360 }
     ],
+    elevationGain: 120,
     coordinates: [
       [49.6537594, 14.4710851], // Point 1
       [49.6545, 14.4720], // Waypoint
@@ -73,6 +74,7 @@ export const routes = [
       { distance: 3, elevation: 350 },
       { distance: 5.5, elevation: 345 }
     ],
+    elevationGain: 45,
     coordinates: [
       [50.084, 14.408],
       [50.085, 14.409],
@@ -132,6 +134,7 @@ export const routes = [
       { distance: 4.5, elevation: 400 },
       { distance: 6.0, elevation: 370 }
     ],
+    elevationGain: 280,
     coordinates: [
       [50.082, 14.415],
       [50.083, 14.416],

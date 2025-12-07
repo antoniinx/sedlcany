@@ -15,74 +15,79 @@ export default function RouteCard({ route }) {
     }
   }, [currentUser, route.id]);
 
+  // Difficulty Color Logic
+  const difficultyColor = route.difficulty === 'Lehká' ? 'text-green-500' :
+    route.difficulty === 'Střední' ? 'text-yellow-500' : 'text-red-500';
+
   return (
     <Link href={`/route/${route.id}`}>
       <motion.div
         whileTap={{ scale: 0.98 }}
-        className="glass-card rounded-2xl overflow-hidden relative group cursor-pointer h-[280px] w-full"
+        className="glass-card rounded-3xl overflow-hidden relative group cursor-pointer w-full transition-all duration-300 hover:shadow-2xl hover:border-accent-primary/30"
       >
-        {/* Abstract Background Gradient based on difficulty */}
-        <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${route.difficulty === 'Lehká' ? 'from-green-500 to-emerald-900' :
-          route.difficulty === 'Střední' ? 'from-yellow-500 to-orange-900' :
-            'from-red-500 to-rose-900'
-          }`} />
+        {/* Background Visuals */}
+        <div className={`absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none`} />
 
-        {/* Content Container */}
-        <div className="relative h-full p-6 flex flex-col justify-between z-10">
+        {/* Gradient Accent - Dynamic based on difficulty */}
+        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${route.difficulty === 'Lehká' ? 'from-green-500/20' : route.difficulty === 'Střední' ? 'from-yellow-500/20' : 'from-red-500/20'} to-transparent rounded-bl-[100px] pointer-events-none`} />
 
-          {/* Header */}
-          <div className="flex justify-between items-start">
-            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/10 ${route.difficulty === 'Lehká' ? 'text-green-400' :
-              route.difficulty === 'Střední' ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
-              {route.difficulty}
-            </span>
+        <div className="p-6 relative z-10">
 
+          {/* Top Row: Difficulty & Badge */}
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center space-x-2">
+              <span className={`h-2.5 w-2.5 rounded-full ${route.difficulty === 'Lehká' ? 'bg-green-500 box-shadow-glow-green' : route.difficulty === 'Střední' ? 'bg-yellow-500 box-shadow-glow-yellow' : 'bg-red-500 box-shadow-glow-red'}`} />
+              <span className={`text-xs font-extrabold uppercase tracking-widest ${difficultyColor}`}>
+                {route.difficulty.toUpperCase()}
+              </span>
+            </div>
             {completionRate !== null && (
-              <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-accent-secondary text-dark-bg font-bold shadow-glow">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-xs">{completionRate}%</span>
+              <div className="px-2 py-1 bg-accent-secondary rounded text-[10px] font-bold text-dark-bg uppercase tracking-wide">
+                Splněno
               </div>
             )}
           </div>
 
-          {/* Main Info */}
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
-              {route.name}
-            </h2>
-            <div className="flex items-center space-x-4 text-sm text-gray-300 font-medium">
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1.5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {route.length} km
-              </div>
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1.5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {route.duration}
+          {/* Title */}
+          <h2 className="text-2xl font-extrabold text-white mb-6 leading-tight max-w-[90%]">
+            {route.name}
+          </h2>
+
+          {/* Stats Grid - The "Sports" Look */}
+          <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-4">
+
+            {/* Distance */}
+            <div>
+              <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Vzdálenost</div>
+              <div className="text-xl font-extrabold text-white flex items-baseline">
+                {route.length}
+                <span className="text-sm font-medium text-gray-500 ml-1">km</span>
               </div>
             </div>
-          </div>
 
-          {/* Action Footer */}
-          <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-            <span className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-              {route.questions.length} Otázek
-            </span>
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-accent-primary transition-colors duration-300">
-              <svg className="w-5 h-5 text-white transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
+            {/* Duration */}
+            <div>
+              <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Čas</div>
+              <div className="text-xl font-extrabold text-white flex items-baseline">
+                {route.duration.split(' ')[0]}
+                <span className="text-sm font-medium text-gray-500 ml-1">h</span>
+              </div>
             </div>
-          </div>
 
+            {/* Elevation (New) */}
+            <div>
+              <div className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">Výstup</div>
+              <div className="text-xl font-extrabold text-accent-primary flex items-baseline">
+                {route.elevationGain || 0}
+                <span className="text-sm font-medium text-gray-500 ml-1">m</span>
+              </div>
+            </div>
+
+          </div>
         </div>
+
+        {/* Action strip at bottom */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </motion.div>
     </Link>
   );
