@@ -26,17 +26,30 @@ function MapBounds({ locations }) {
 }
 
 export default function RoutesMap({ routes = [], userLocation }) {
-    const createIcon = (color) => new L.Icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
 
-    const blueIcon = createIcon('blue'); // User
-    const redIcon = createIcon('red'); // specific route marker
+    // Custom DivIcons
+    const createCustomIcon = (type, text = '', isUser = false) => {
+        if (isUser) {
+            return new L.DivIcon({
+                className: 'custom-div-icon',
+                html: `<div class="marker-user"></div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+        }
+
+        return new L.DivIcon({
+            className: 'custom-div-icon',
+            html: `
+              <div class="custom-marker-pin">
+                  <div class="marker-pin-inner">${text}</div>
+              </div>
+            `,
+            iconSize: [44, 44],
+            iconAnchor: [22, 44],
+            popupAnchor: [0, -44]
+        });
+    };
 
     // Collect all relevant points for bounds
     const allPoints = routes
@@ -48,34 +61,37 @@ export default function RoutesMap({ routes = [], userLocation }) {
     }
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full bg-[#0F1115]">
             <MapContainer
                 center={[49.66, 14.42]} // Approx Sedlcany center
                 zoom={12}
-                style={{ height: '100%', width: '100%' }}
+                style={{ height: '100%', width: '100%', background: '#0F1115' }}
                 scrollWheelZoom={true}
+                zoomControl={false}
             >
                 <TileLayer
+                    className="map-tiles-dark"
                     attribution='&copy; <a href="https://www.seznam.cz">Seznam.cz, a.s.</a>'
                     url={`https://api.mapy.com/v1/maptiles/outdoor/256/{z}/{x}/{y}?apikey=${MAPY_API_KEY}`}
                     maxZoom={19}
+                    detectRetina={true}
                 />
 
-                {routes.map((route) => {
+                {routes.map((route, i) => {
                     if (!route.coordinates || route.coordinates.length === 0) return null;
                     const startPoint = route.coordinates[0];
 
                     return (
-                        <Marker key={route.id} position={startPoint} icon={redIcon}>
+                        <Marker key={route.id} position={startPoint} icon={createCustomIcon('route', (i + 1).toString())}>
                             <Popup>
-                                <div className="text-center min-w-[200px]">
-                                    <h3 className="font-bold text-lg mb-1">{route.name}</h3>
-                                    <div className="flex justify-between text-xs text-gray-500 mb-2">
+                                <div className="text-center min-w-[200px] p-2">
+                                    <h3 className="font-bold text-lg mb-1 text-white">{route.name}</h3>
+                                    <div className="flex justify-between text-xs text-gray-400 mb-3">
                                         <span>{route.length} km</span>
                                         <span>{route.duration}</span>
                                     </div>
                                     <Link href={`/route/${route.id}`}>
-                                        <button className="w-full py-2 bg-accent-primary text-white rounded-lg font-bold text-xs uppercase hover:bg-red-600 transition-colors">
+                                        <button className="w-full py-2.5 bg-accent-primary text-white rounded-lg font-bold text-xs uppercase hover:bg-red-600 transition-colors shadow-lg shadow-accent-primary/20">
                                             Zobrazit trasu
                                         </button>
                                     </Link>
@@ -86,7 +102,7 @@ export default function RoutesMap({ routes = [], userLocation }) {
                 })}
 
                 {userLocation && (
-                    <Marker position={[userLocation.lat, userLocation.lng]} icon={blueIcon} zIndexOffset={1000}>
+                    <Marker position={[userLocation.lat, userLocation.lng]} icon={createCustomIcon('user', '', true)} zIndexOffset={1000}>
                         <Popup>
                             <span className="text-sm font-bold text-accent-primary">Tvoje poloha</span>
                         </Popup>

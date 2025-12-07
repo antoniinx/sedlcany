@@ -48,65 +48,83 @@ export default function Map({ coordinates, questions = [], currentQuestionIndex 
     );
   }
 
-  // Icons
-  const createIcon = (color) => new L.Icon({
-    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
+  // Custom DivIcons
+  const createCustomIcon = (color, text = '', isUser = false) => {
+    if (isUser) {
+      return new L.DivIcon({
+        className: 'custom-div-icon',
+        html: `<div class="marker-user"></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+    }
 
-  const blueIcon = createIcon('blue'); // User
-  const redIcon = createIcon('red'); // Future
-  const greenIcon = createIcon('green'); // Completed
-  const goldIcon = createIcon('gold'); // Active
+    let bgClass = '';
+    if (color === 'green') bgClass = 'marker-green';
+    if (color === 'gold') bgClass = 'marker-gold';
+    if (color === 'red') bgClass = ''; // Default red gradient
+
+    return new L.DivIcon({
+      className: 'custom-div-icon',
+      html: `
+            <div class="custom-marker-pin ${bgClass}">
+                <div class="marker-pin-inner">${text}</div>
+            </div>
+          `,
+      iconSize: [44, 44],
+      iconAnchor: [22, 44],
+      popupAnchor: [0, -44]
+    });
+  };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-[#0F1115]">
       <MapContainer
         center={coordinates[0]}
         zoom={13}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', background: '#0F1115' }}
         scrollWheelZoom={true}
+        zoomControl={false}
       >
-        {/* Mapy.cz Outdoor (Turistická) Layer */}
+        {/* Mapy.cz Outdoor Layer with Retina & Dark Filter */}
         <TileLayer
+          className="map-tiles-dark"
           key="mapy-cz-outdoor"
-          attribution='&copy; <a href="https://www.seznam.cz">Seznam.cz, a.s.</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          attribution='&copy; <a href="https://www.seznam.cz">Seznam.cz, a.s.</a>'
           url={`https://api.mapy.com/v1/maptiles/outdoor/256/{z}/{x}/{y}?apikey=${MAPY_API_KEY}`}
           maxZoom={19}
+          detectRetina={true}
         />
 
         <Polyline
           positions={coordinates}
           color="#ff3b30"
-          weight={5}
+          weight={4}
           opacity={0.8}
+          dashArray="10, 10"
         />
 
         {/* Question Markers */}
         {questions.map((q, index) => {
           if (!q.coordinates) return null;
 
-          let icon = redIcon;
+          let color = 'red';
           let statusText = "Další bod";
 
           if (index < currentQuestionIndex) {
-            icon = greenIcon;
+            color = 'green';
             statusText = "Dokončeno";
           } else if (index === currentQuestionIndex) {
-            icon = goldIcon;
+            color = 'gold';
             statusText = "Cíl";
           }
 
           return (
-            <Marker key={q.id} position={q.coordinates} icon={icon}>
+            <Marker key={q.id} position={q.coordinates} icon={createCustomIcon(color, (index + 1).toString())}>
               <Popup>
-                <div className="text-center">
-                  <span className="font-bold block">{statusText}</span>
-                  <span className="text-xs text-gray-500">Otázka {index + 1}</span>
+                <div className="text-center p-2">
+                  <span className="font-bold block text-sm mb-1">{statusText}</span>
+                  <span className="text-xs text-gray-400">Otázka {index + 1}</span>
                 </div>
               </Popup>
             </Marker>
@@ -114,7 +132,7 @@ export default function Map({ coordinates, questions = [], currentQuestionIndex 
         })}
 
         {userLocation && (
-          <Marker position={[userLocation.lat, userLocation.lng]} icon={blueIcon} zIndexOffset={1000}>
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={createCustomIcon('blue', '', true)} zIndexOffset={1000}>
             <Popup>
               <span className="text-sm font-bold text-accent-primary">Tvoje poloha</span>
             </Popup>
