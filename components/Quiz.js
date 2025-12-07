@@ -29,7 +29,7 @@ export default function Quiz({ question, onAnswer, isLastQuestion }) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative px-1">
       <AnimatePresence mode="wait">
         <motion.div
           key={question.id}
