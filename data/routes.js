@@ -1,62 +1,64 @@
 export const routes = [
   {
     id: 1,
-    name: "Památeční stromy kolem Sedlčan",
-    description: "Procházky kolem památečních stromů kolem Sedlčan.",
-    length: 4.7, // km
-    difficulty: "Střední",
-    duration: "1h 30m",
-    reward: 27,
+    name: "Okruh kolem Sedlčan",
+    description: "Pohodový okruh po turistických značkách z centra města k zámku Červený Hrádek a zpět.",
+    length: 5.5,
+    difficulty: "Lehká",
+    duration: "1h 45m",
+    reward: 50,
     elevationProfile: [
-      { distance: 0, elevation: 350 },
-      { distance: 1, elevation: 365 },
-      { distance: 2, elevation: 380 },
-      { distance: 3, elevation: 370 },
-      { distance: 4.7, elevation: 360 }
+      { distance: 0, elevation: 320 },
+      { distance: 2.5, elevation: 360 },
+      { distance: 5.5, elevation: 320 }
     ],
-    elevationGain: 120,
+    elevationGain: 85,
     coordinates: [
-      [49.6537594, 14.4710851], // Point 1
-      [49.6545, 14.4720], // Waypoint
-      [50.088, 14.422], // Point 2 (Needs update later)
-      [50.089, 14.423]  // Point 3 (Needs update later)
+      [49.6587214, 14.4281358], // Náměstí TGM
+      [49.6580, 14.4380],
+      [49.6575, 14.4450],
+      [49.6565125, 14.4542881], // Červený Hrádek
+      [49.6550, 14.4500],
+      [49.6540, 14.4400],
+      [49.6560, 14.4300],
+      [49.6587214, 14.4281358] // Back to Start
     ],
     questions: [
       {
         id: 1,
-        question: "What year was the oldest oak tree planted?",
+        question: "Do kterého století sahá doložená historie města Sedlčany?",
         options: [
-          { id: "a", text: "1850" },
-          { id: "b", text: "1900" },
-          { id: "c", text: "1750" }
+          { id: "a", text: "11. století" },
+          { id: "b", text: "13. století" },
+          { id: "c", text: "15. století" }
         ],
-        correctAnswer: "c",
+        correctAnswer: "a",
         points: 10,
-        coordinates: [49.6537594, 14.4710851] // Kosova Hora 4
+        coordinates: [49.6587214, 14.4281358]
       },
       {
         id: 2,
-        question: "What is the average age of the oak trees on this trail?",
+        question: "Který významný architekt navrhl přestavbu zámku Červený Hrádek?",
         options: [
-          { id: "a", text: "100 years" },
-          { id: "b", text: "200 years" },
-          { id: "c", text: "300 years" }
+          { id: "a", text: "Josef Gočár" },
+          { id: "b", text: "Jan Kotěra" },
+          { id: "c", text: "Dušan Jurkovič" }
         ],
         correctAnswer: "b",
-        points: 10,
-        coordinates: [50.088, 14.422] // Mid-point
+        points: 20,
+        coordinates: [49.6565125, 14.4542881]
       },
       {
         id: 3,
-        question: "Which bird is commonly found near these oaks?",
+        question: "Jak se jmenuje známá rozhledna nedaleko Sedlčan?",
         options: [
-          { id: "a", text: "Robin" },
-          { id: "b", text: "Woodpecker" },
-          { id: "c", text: "Sparrow" }
+          { id: "a", text: "Drahoušek" },
+          { id: "b", text: "Blaník" },
+          { id: "c", text: "Cukrák" }
         ],
-        correctAnswer: "b",
-        points: 10,
-        coordinates: [50.089, 14.423] // End of trail
+        correctAnswer: "a",
+        points: 20,
+        coordinates: [49.6560, 14.4300]
       }
     ]
   },

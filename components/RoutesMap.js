@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Link from 'next/link';
@@ -23,6 +23,53 @@ function MapBounds({ locations }) {
         }
     }, [map, locations]);
     return null;
+}
+
+function RealRoutePolyline({ route, color = '#F87171' }) {
+    const [positions, setPositions] = useState([]);
+
+    useEffect(() => {
+        const fetchRoute = async () => {
+            if (!route || !route.coordinates || route.coordinates.length < 2) return;
+
+            try {
+                // Convert [lat, lon] (Leaflet) to lon,lat (Mapy.cz API)
+                const start = `${route.coordinates[0][1]},${route.coordinates[0][0]}`;
+                const end = `${route.coordinates[route.coordinates.length - 1][1]},${route.coordinates[route.coordinates.length - 1][0]}`;
+
+                // Intermediate waypoints
+                const waypoints = route.coordinates.slice(1, -1).map(c => `${c[1]},${c[0]}`).join(';');
+
+                let url = `https://api.mapy.cz/v1/routing/route?apikey=${MAPY_API_KEY}&start=${start}&end=${end}&routeType=foot_fast&geometry=true`;
+                if (waypoints) {
+                    url += `&waypoints=${waypoints}`;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.geometry && data.geometry.geometry && data.geometry.geometry.coordinates) {
+                    // Mapy.cz returns [lon, lat], Leaflet needs [lat, lon]
+                    const decoded = data.geometry.geometry.coordinates.map(c => [c[1], c[0]]);
+                    setPositions(decoded);
+                } else if (data.geometry && data.geometry.coordinates) {
+                    // Sometimes structure varies, handle direct coordinates
+                    const decoded = data.geometry.coordinates.map(c => [c[1], c[0]]);
+                    setPositions(decoded);
+                }
+            } catch (error) {
+                console.error("Error fetching route geometry:", error);
+                // Fallback to straight lines if API fails
+                setPositions(route.coordinates);
+            }
+        };
+
+        fetchRoute();
+    }, [route]);
+
+    if (positions.length === 0) return null;
+
+    return <Polyline positions={positions} pathOptions={{ color: color, weight: 4, opacity: 0.8 }} />;
 }
 
 export default function RoutesMap({ routes = [], userLocation }) {
@@ -82,22 +129,26 @@ export default function RoutesMap({ routes = [], userLocation }) {
                     const startPoint = route.coordinates[0];
 
                     return (
-                        <Marker key={route.id} position={startPoint} icon={createCustomIcon('route', (i + 1).toString())}>
-                            <Popup>
-                                <div className="text-center min-w-[200px] p-2">
-                                    <h3 className="font-bold text-lg mb-1 text-white">{route.name}</h3>
-                                    <div className="flex justify-between text-xs text-gray-400 mb-3">
-                                        <span>{route.length} km</span>
-                                        <span>{route.duration}</span>
+                        <div key={route.id}>
+                            <RealRoutePolyline route={route} />
+
+                            <Marker position={startPoint} icon={createCustomIcon('route', (i + 1).toString())}>
+                                <Popup>
+                                    <div className="text-center min-w-[200px] p-2">
+                                        <h3 className="font-bold text-lg mb-1 text-white">{route.name}</h3>
+                                        <div className="flex justify-between text-xs text-gray-400 mb-3">
+                                            <span>{route.length} km</span>
+                                            <span>{route.duration}</span>
+                                        </div>
+                                        <Link href={`/route/${route.id}`}>
+                                            <button className="w-full py-2.5 bg-accent-primary text-white rounded-lg font-bold text-xs uppercase hover:bg-red-600 transition-colors shadow-lg shadow-accent-primary/20">
+                                                Zobrazit trasu
+                                            </button>
+                                        </Link>
                                     </div>
-                                    <Link href={`/route/${route.id}`}>
-                                        <button className="w-full py-2.5 bg-accent-primary text-white rounded-lg font-bold text-xs uppercase hover:bg-red-600 transition-colors shadow-lg shadow-accent-primary/20">
-                                            Zobrazit trasu
-                                        </button>
-                                    </Link>
-                                </div>
-                            </Popup>
-                        </Marker>
+                                </Popup>
+                            </Marker>
+                        </div>
                     );
                 })}
 
