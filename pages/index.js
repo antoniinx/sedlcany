@@ -31,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg pb-32 relative overflow-hidden">
+    <div className="min-h-screen bg-dark-bg pb-32 pt-32 relative overflow-hidden"> {/* Added pt-32 for navbar safety */}
 
       {/* Background Decor */}
       <div className="fixed top-0 left-0 w-full h-[500px] bg-accent-primary/5 rounded-b-[50%] blur-3xl pointer-events-none" />

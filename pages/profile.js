@@ -25,11 +25,11 @@ export default function Profile() {
     // The 'points' field in currentUser object is the single source of truth for total score.
 
     return (
-        <div className="min-h-screen bg-dark-bg pb-32 relative overflow-hidden">
+        <div className="min-h-screen bg-dark-bg pb-32 pt-32 relative overflow-hidden">
             {/* Background Decor */}
             <div className="fixed top-0 left-0 w-full h-[300px] bg-accent-primary/5 rounded-b-[50%] blur-3xl pointer-events-none" />
 
-            <div className="max-w-2xl mx-auto px-4 pt-24 relative z-10">
+            <div className="max-w-2xl mx-auto px-4 relative z-10">
 
                 {/* Profile Header */}
                 <motion.div

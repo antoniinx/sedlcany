@@ -2,12 +2,12 @@ import Link from 'next/link';
 
 export default function CityInfo() {
     return (
-        <div className="min-h-screen bg-dark-bg pb-32 relative overflow-hidden">
+        <div className="min-h-screen bg-dark-bg pb-32 pt-32 relative overflow-hidden">
             {/* Background Decor */}
             <div className="fixed top-0 right-0 w-[300px] h-[300px] bg-accent-secondary/10 rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2" />
             <div className="fixed bottom-0 left-0 w-[200px] h-[200px] bg-accent-primary/10 rounded-full blur-3xl pointer-events-none transform -translate-x-1/2 translate-y-1/2" />
 
-            <div className="max-w-2xl mx-auto px-6 pt-24 relative z-10">
+            <div className="max-w-2xl mx-auto px-6 relative z-10">
 
                 {/* Header */}
                 <div className="mb-10 text-center">

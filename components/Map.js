@@ -55,7 +55,7 @@ export default function Map({ coordinates, questions = [], currentQuestionIndex 
         className: 'custom-div-icon',
         html: `<div class="marker-user"></div>`,
         iconSize: [20, 20],
-        iconAnchor: [10, 10]
+        iconAnchor: [10, 10] // Center of the 20x20 circle
       });
     }
 
@@ -71,9 +71,13 @@ export default function Map({ coordinates, questions = [], currentQuestionIndex 
                 <div class="marker-pin-inner">${text}</div>
             </div>
           `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 44],
-      popupAnchor: [0, -44]
+      iconSize: [48, 48],
+      /* 
+         Anchor X: Center = 24
+         Anchor Y: Center (24) + Distance to Corner (~34) = 58 
+      */
+      iconAnchor: [24, 58],
+      popupAnchor: [0, -58]
     });
   };
 

@@ -34,6 +34,14 @@ body {
   background-attachment: fixed;
 }
 
+/* Page Layout Utilities */
+.page-safe-area {
+  padding-top: 80px;
+  /* Space for Top Bar */
+  padding-bottom: 120px;
+  /* Space for Bottom Dock */
+}
+
 /* Adventure Card Utilities */
 .adventure-card {
   background: rgba(30, 41, 59, 0.6);
@@ -112,46 +120,39 @@ body {
 }
 
 /* Premium Gradient Markers - Adventure Style */
+/* Pin is a 48x48 square rotated -45deg. 
+   Center is (24, 24).
+   Radius from center to corner is ~34px.
+   Visual Height is ~58px.
+   Tip is at Bottom. */
 .custom-marker-pin {
   width: 48px;
   height: 48px;
   border-radius: 50% 50% 50% 0;
   background: linear-gradient(135deg, #F87171 0%, #DC2626 100%);
   position: absolute;
+  /* Reset positioning - let Leaflet handle anchor */
+  left: 0;
+  top: 0;
   transform: rotate(-45deg);
-  left: 50%;
-  top: 50%;
-  margin: -24px 0 0 -24px;
   box-shadow:
-    0 12px 25px -5px rgba(248, 113, 113, 0.5),
-    0 4px 6px -2px rgba(0, 0, 0, 0.2),
+    10px 10px 20px rgba(248, 113, 113, 0.4),
     inset 0 2px 4px rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 3px solid white;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s;
 }
 
 .custom-marker-pin:hover {
   transform: rotate(-45deg) scale(1.15) translateY(-5px);
-  box-shadow:
-    0 20px 35px -5px rgba(248, 113, 113, 0.6),
-    0 8px 10px -2px rgba(0, 0, 0, 0.3);
   z-index: 100 !important;
+  box-shadow:
+    15px 15px 30px rgba(248, 113, 113, 0.5);
 }
 
-.custom-marker-pin::after {
-  content: '';
-  width: 28px;
-  height: 28px;
-  margin: 6px 0 0 6px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(2px);
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
+
 
 .marker-user {
   background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
@@ -165,6 +166,7 @@ body {
 }
 
 .marker-pin-inner {
+  /* Counter-rotate to be straight */
   transform: rotate(45deg);
   color: white;
   font-weight: 900;

@@ -91,8 +91,8 @@ export default function RoutePage() {
       {/* Map Layer */}
       {/* If Navigating: Top 60%, If Overview: Top 40% */}
       <div className={`
-        relative w-full transition-all duration-500 ease-in-out
-        ${isNavigating ? 'h-[60vh] z-0' : 'fixed inset-0 h-[40vh] sm:h-[50vh] z-0 mask-image-b'}
+        relative w-full z-0 transition-all duration-500 ease-in-out
+        ${isNavigating ? 'h-[60vh]' : 'h-[50vh]'} 
       `}>
         <Map
           coordinates={route.coordinates}
@@ -100,19 +100,17 @@ export default function RoutePage() {
           currentQuestionIndex={currentQuestionIndex}
           userLocation={location}
         />
-        {/* Gradient Overlay only when NOT navigating (overview mode) */}
         {!isNavigating && (
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-bg/20 to-dark-bg pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-dark-bg to-transparent pointer-events-none" />
         )}
       </div>
 
-      {/* Content Layer */}
-      {/* If Navigating: Bottom 40%, If Overview: Standard Scroll */}
+      {/* Content Layer - Overlaps Map */}
       <div className={`
-        relative transition-all duration-500 ease-in-out z-10
+        relative z-10 transition-all duration-500 ease-in-out px-4 sm:px-6
         ${isNavigating
-          ? 'h-[40vh] bg-dark-bg border-t border-white/10 shadow-up-lg' // Fixed Bottom Sheet
-          : 'pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto pb-32 pointer-events-none' // passthrough for map
+          ? 'flex-1 bg-dark-bg border-t border-white/10 shadow-up-lg pb-32 -mt-8 rounded-t-3xl'
+          : '-mt-20 pb-40 max-w-4xl mx-auto'
         }
       `}>
         <motion.div
