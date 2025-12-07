@@ -86,7 +86,7 @@ export default function RoutePage() {
   const isNavigating = !showOverview && !isCompleted;
 
   return (
-    <div className="min-h-screen bg-dark-bg relative overflow-hidden">
+    <div className={`min-h-screen bg-dark-bg relative ${isNavigating ? 'overflow-hidden' : ''}`}>
 
       {/* Map Layer - Fullscreen during navigation */}
       <div className={`fixed inset-0 transition-all duration-500 ease-in-out ${isNavigating ? 'z-10 h-full' : 'z-0 h-[40vh] sm:h-[50vh] mask-image-b'}`}>
@@ -107,7 +107,7 @@ export default function RoutePage() {
         relative z-20 transition-all duration-500 ease-in-out
         ${isNavigating
           ? 'fixed bottom-0 left-0 right-0 p-4' // Floating Bottom Sheet
-          : 'pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto h-full' // Standard Scroll View
+          : 'pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto pb-32' // Standard Scroll View with padding
         }
       `}>
         <motion.div
