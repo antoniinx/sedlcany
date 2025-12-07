@@ -87,7 +87,12 @@ export default function RoutePage() {
 
       {/* Immersive Map Background - Always show Route & User Location */}
       <div className={`fixed inset-0 z-0 transition-all duration-500 ${(!showOverview && !isNearTarget) ? 'h-[70vh]' : 'h-[40vh] sm:h-[50vh]'} mask-image-b`}>
-        <Map coordinates={route.coordinates} showMarkers={true} userLocation={location} />
+        <Map
+          coordinates={route.coordinates}
+          questions={route.questions}
+          currentQuestionIndex={currentQuestionIndex}
+          userLocation={location}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-bg/20 to-dark-bg pointer-events-none" />
       </div>
 

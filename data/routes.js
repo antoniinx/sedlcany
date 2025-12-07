@@ -15,9 +15,10 @@ export const routes = [
       { distance: 4.7, elevation: 360 }
     ],
     coordinates: [
-      [50.087, 14.421],
-      [50.088, 14.422],
-      [50.089, 14.423]
+      [49.6537594, 14.4710851], // Point 1
+      [49.6545, 14.4720], // Waypoint
+      [50.088, 14.422], // Point 2 (Needs update later)
+      [50.089, 14.423]  // Point 3 (Needs update later)
     ],
     questions: [
       {
