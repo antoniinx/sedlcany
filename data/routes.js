@@ -30,7 +30,7 @@ export const routes = [
         ],
         correctAnswer: "c",
         points: 10,
-        coordinates: [49.6541422, 14.4717275] // Kosova Hora 4
+        coordinates: [49.6537594, 14.4710851] // Kosova Hora 4
       },
       {
         id: 2,
