@@ -8,6 +8,7 @@ import Quiz from '../../components/Quiz';
 import ElevationProfile from '../../components/ElevationProfile';
 import { useAuth } from '../../contexts/AuthContext';
 import { calculateDistance, useGeolocation } from '../../utils/geolocation';
+import { fetchRouteElevationProfile } from '../../utils/mapy';
 
 const Map = dynamic(() => import('../../components/Map'), { ssr: false });
 
@@ -15,6 +16,7 @@ export default function RoutePage() {
   const router = useRouter();
   const { id } = router.query;
   const [route, setRoute] = useState(null);
+  const [realElevationProfile, setRealElevationProfile] = useState(null);
   const [showOverview, setShowOverview] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -33,6 +35,10 @@ export default function RoutePage() {
       const foundRoute = routes.find((r) => r.id === parseInt(id, 10));
       if (foundRoute) {
         setRoute(foundRoute);
+        // Fetch real elevation
+        fetchRouteElevationProfile(foundRoute).then(profile => {
+          if (profile) setRealElevationProfile(profile);
+        });
       } else {
         router.push('/');
       }
@@ -236,17 +242,17 @@ export default function RoutePage() {
                   </div>
 
                   {/* Elevation Profile - Adventure Style */}
-                  {route.elevationProfile && (
+                  {(realElevationProfile || route.elevationProfile) && (
                     <div className="mb-8">
                       <div className="flex justify-between items-end mb-4">
                         <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                           <svg className="w-4 h-4 text-accent-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                           TERÉN MISE
                         </h3>
-                        <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-white">MAX {Math.max(...route.elevationProfile.map(p => p.elevation))}m</span>
+                        <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-white">MAX {Math.max(...(realElevationProfile || route.elevationProfile).map(p => p.elevation))}m</span>
                       </div>
                       <div className="adventure-card p-4">
-                        <ElevationProfile profile={route.elevationProfile} color="#fbbf24" />
+                        <ElevationProfile profile={realElevationProfile || route.elevationProfile} color="#fbbf24" />
                       </div>
                     </div>
                   )}
