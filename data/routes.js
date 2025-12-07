@@ -30,7 +30,7 @@ export const routes = [
         ],
         correctAnswer: "c",
         points: 10,
-        coordinates: [50.087, 14.421] // Start of trail
+        coordinates: [49.6541422, 14.4717275] // Kosova Hora 4
       },
       {
         id: 2,
