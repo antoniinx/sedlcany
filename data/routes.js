@@ -29,7 +29,8 @@ export const routes = [
           { id: "c", text: "1750" }
         ],
         correctAnswer: "c",
-        points: 10
+        points: 10,
+        coordinates: [50.087, 14.421] // Start of trail
       },
       {
         id: 2,
@@ -40,7 +41,8 @@ export const routes = [
           { id: "c", text: "300 years" }
         ],
         correctAnswer: "b",
-        points: 10
+        points: 10,
+        coordinates: [50.088, 14.422] // Mid-point
       },
       {
         id: 3,
@@ -51,7 +53,8 @@ export const routes = [
           { id: "c", text: "Sparrow" }
         ],
         correctAnswer: "b",
-        points: 10
+        points: 10,
+        coordinates: [50.089, 14.423] // End of trail
       }
     ]
   },
@@ -84,7 +87,8 @@ export const routes = [
           { id: "c", text: "Wolf" }
         ],
         correctAnswer: "a",
-        points: 10
+        points: 10,
+        coordinates: [50.084, 14.408]
       },
       {
         id: 2,
@@ -95,7 +99,8 @@ export const routes = [
           { id: "c", text: "40m" }
         ],
         correctAnswer: "b",
-        points: 10
+        points: 10,
+        coordinates: [50.085, 14.409]
       },
       {
         id: 3,
@@ -106,7 +111,8 @@ export const routes = [
           { id: "c", text: "Fall" }
         ],
         correctAnswer: "a",
-        points: 10
+        points: 10,
+        coordinates: [50.086, 14.410]
       }
     ]
   },
@@ -140,7 +146,8 @@ export const routes = [
           { id: "c", text: "Green" }
         ],
         correctAnswer: "a",
-        points: 10
+        points: 10,
+        coordinates: [50.082, 14.415]
       },
       {
         id: 2,
@@ -151,7 +158,8 @@ export const routes = [
           { id: "c", text: "Maple bark" }
         ],
         correctAnswer: "a",
-        points: 10
+        points: 10,
+        coordinates: [50.083, 14.416]
       },
       {
         id: 3,
@@ -162,7 +170,8 @@ export const routes = [
           { id: "c", text: "Australia" }
         ],
         correctAnswer: "a",
-        points: 10
+        points: 10,
+        coordinates: [50.084, 14.417]
       }
     ]
   }

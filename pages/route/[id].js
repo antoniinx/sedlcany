@@ -7,6 +7,7 @@ import { routes } from '../../data/routes';
 import Quiz from '../../components/Quiz';
 import ElevationProfile from '../../components/ElevationProfile';
 import { useAuth } from '../../contexts/AuthContext';
+import { calculateDistance, useGeolocation } from '../../utils/geolocation';
 
 const Map = dynamic(() => import('../../components/Map'), { ssr: false });
 
@@ -22,6 +23,11 @@ export default function RoutePage() {
   const [showCompletion, setShowCompletion] = useState(false);
   const { updateUserProgress } = useAuth();
 
+  // Geolocation
+  const { location, error: geoError } = useGeolocation();
+  const [distanceToNextPoint, setDistanceToNextPoint] = useState(null);
+  const [isNearTarget, setIsNearTarget] = useState(false);
+
   useEffect(() => {
     if (id) {
       const foundRoute = routes.find((r) => r.id === parseInt(id, 10));
@@ -33,6 +39,20 @@ export default function RoutePage() {
     }
   }, [id, router]);
 
+  // Check distance to current question target
+  useEffect(() => {
+    if (route && location && !showOverview && !isCompleted) {
+      const currentTarget = route.questions[currentQuestionIndex]?.coordinates;
+      if (currentTarget) {
+        const dist = calculateDistance(location.lat, location.lng, currentTarget[0], currentTarget[1]);
+        setDistanceToNextPoint(dist);
+        // Unlock if closer than 50 meters
+        setIsNearTarget(dist <= 50);
+      }
+    }
+  }, [route, location, showOverview, currentQuestionIndex, isCompleted]);
+
+
   const handleAnswer = (selectedAnswer, isCorrect) => {
     const newAnswers = [...answers, { selectedAnswer, isCorrect }];
     setAnswers(newAnswers);
@@ -43,6 +63,7 @@ export default function RoutePage() {
 
     if (currentQuestionIndex < route.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
+      setIsNearTarget(false); // Lock next question immediately
     } else {
       setIsCompleted(true);
       setShowCompletion(true);
@@ -64,14 +85,14 @@ export default function RoutePage() {
   return (
     <div className="min-h-screen bg-dark-bg pb-24 relative">
 
-      {/* Immersive Map Background */}
-      <div className="fixed inset-0 z-0 h-[40vh] sm:h-[50vh] mask-image-b">
-        <Map coordinates={route.coordinates} showMarkers={true} />
+      {/* Immersive Map Background - Always show Route & User Location */}
+      <div className={`fixed inset-0 z-0 transition-all duration-500 ${(!showOverview && !isNearTarget) ? 'h-[70vh]' : 'h-[40vh] sm:h-[50vh]'} mask-image-b`}>
+        <Map coordinates={route.coordinates} showMarkers={true} userLocation={location} />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-bg/20 to-dark-bg pointer-events-none" />
       </div>
 
       {/* Main Content Sheet */}
-      <div className="relative z-10 pt-[35vh] sm:pt-[45vh] px-4 sm:px-6 max-w-4xl mx-auto">
+      <div className={`relative z-10 transition-all duration-500 ${(!showOverview && !isNearTarget) ? 'pt-[65vh]' : 'pt-[35vh] sm:pt-[45vh]'} px-4 sm:px-6 max-w-4xl mx-auto`}>
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -167,32 +188,64 @@ export default function RoutePage() {
                 </button>
               </motion.div>
             ) : (
+              /* QUIZ FLOW - Geolocation Protected */
               <motion.div
                 key="quiz"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="font-bold text-white">Etape {currentQuestionIndex + 1}</h2>
-                  <div className="text-sm font-medium text-gray-400">
-                    {currentQuestionIndex + 1} / {route.questions.length}
+                {isNearTarget ? (
+                  <>
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="font-bold text-white">Etape {currentQuestionIndex + 1}</h2>
+                      <div className="text-sm font-medium text-gray-400">
+                        {currentQuestionIndex + 1} / {route.questions.length}
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 bg-white/10 rounded-full mb-6 overflow-hidden">
+                      <motion.div
+                        className="h-full bg-accent-primary rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${((currentQuestionIndex + 1) / route.questions.length) * 100}%` }}
+                      />
+                    </div>
+
+                    <Quiz
+                      question={route.questions[currentQuestionIndex]}
+                      onAnswer={handleAnswer}
+                      isLastQuestion={currentQuestionIndex === route.questions.length - 1}
+                    />
+                  </>
+                ) : (
+                  /* LOCKED STATE - NAVIGATION MODE */
+                  <div className="text-center py-10">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                      <svg className="w-8 h-8 text-accent-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Najdi další bod</h2>
+                    <p className="text-gray-400 max-w-xs mx-auto mb-6">
+                      K odemčení otázky musíš dojít na určené místo.
+                    </p>
+
+                    {distanceToNextPoint !== null ? (
+                      <div className="inline-block bg-accent-primary/20 border border-accent-primary/40 rounded-xl px-6 py-3">
+                        <span className="text-2xl font-bold text-accent-primary">{distanceToNextPoint} m</span>
+                        <span className="block text-[10px] text-accent-primary/70 uppercase tracking-widest mt-1">Vzdálenost</span>
+                      </div>
+                    ) : (
+                      <div className="text-red-400 text-sm">
+                        {geoError ? 'Povol přístup k poloze' : 'Hledám signál...'}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-500 mt-8">
+                      Sleduj mapu nahoře pro navigaci k bodu.
+                    </p>
                   </div>
-                </div>
+                )}
 
-                {/* Progress Bar */}
-                <div className="h-1.5 bg-white/10 rounded-full mb-6 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-accent-primary rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((currentQuestionIndex + 1) / route.questions.length) * 100}%` }}
-                  />
-                </div>
-
-                <Quiz
-                  question={route.questions[currentQuestionIndex]}
-                  onAnswer={handleAnswer}
-                  isLastQuestion={currentQuestionIndex === route.questions.length - 1}
-                />
               </motion.div>
             )}
           </AnimatePresence>

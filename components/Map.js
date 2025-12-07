@@ -39,7 +39,7 @@ function MapBounds({ coordinates }) {
   return null;
 }
 
-export default function Map({ coordinates, showMarkers = false }) {
+export default function Map({ coordinates, showMarkers = false, userLocation }) {
   if (!coordinates || coordinates.length === 0) {
     return (
       <div className="w-full h-full bg-dark-bg flex items-center justify-center border border-dark-border rounded-xl">
@@ -47,6 +47,16 @@ export default function Map({ coordinates, showMarkers = false }) {
       </div>
     );
   }
+
+  // Blue dot icon for user
+  const userIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
 
   return (
     <div className="w-full h-full">
@@ -77,6 +87,15 @@ export default function Map({ coordinates, showMarkers = false }) {
             </Popup>
           </Marker>
         ))}
+
+        {userLocation && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} zIndexOffset={1000}>
+            <Popup>
+              <span className="text-sm font-bold text-accent-primary">Já (Ty)</span>
+            </Popup>
+          </Marker>
+        )}
+
         <MapBounds coordinates={coordinates} />
       </MapContainer>
     </div>
