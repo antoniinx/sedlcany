@@ -1,18 +1,19 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function RouteCard({ route }) {
   const [completionRate, setCompletionRate] = useState(null);
-  const [mounted, setMounted] = useState(false);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    setMounted(true);
-    const completedRoutes = JSON.parse(localStorage.getItem('completedRoutes') || '{}');
-    if (completedRoutes[route.id]) {
-      setCompletionRate(completedRoutes[route.id].successRate);
+    if (currentUser?.completedRoutes?.[route.id]) {
+      setCompletionRate(currentUser.completedRoutes[route.id].successRate);
+    } else {
+      setCompletionRate(null);
     }
-  }, [route.id]);
+  }, [currentUser, route.id]);
 
   return (
     <Link href={`/route/${route.id}`}>
@@ -22,8 +23,8 @@ export default function RouteCard({ route }) {
       >
         {/* Abstract Background Gradient based on difficulty */}
         <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${route.difficulty === 'Lehká' ? 'from-green-500 to-emerald-900' :
-            route.difficulty === 'Střední' ? 'from-yellow-500 to-orange-900' :
-              'from-red-500 to-rose-900'
+          route.difficulty === 'Střední' ? 'from-yellow-500 to-orange-900' :
+            'from-red-500 to-rose-900'
           }`} />
 
         {/* Content Container */}
@@ -32,8 +33,8 @@ export default function RouteCard({ route }) {
           {/* Header */}
           <div className="flex justify-between items-start">
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/10 ${route.difficulty === 'Lehká' ? 'text-green-400' :
-                route.difficulty === 'Střední' ? 'text-yellow-400' :
-                  'text-red-400'
+              route.difficulty === 'Střední' ? 'text-yellow-400' :
+                'text-red-400'
               }`}>
               {route.difficulty}
             </span>

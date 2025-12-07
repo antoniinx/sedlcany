@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
   const router = useRouter();
+  const { currentUser, loading } = useAuth();
 
   const isActive = (path) => router.pathname === path;
 
@@ -44,15 +46,36 @@ export default function Navbar() {
                 </div>
               </Link>
 
-              {/* Profile/Points Link Placeholder - functionalities logic can be added later */}
-              <div className="opacity-50 pointer-events-none relative flex flex-col items-center group">
-                <div className="p-2 rounded-xl">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <span className="text-[10px] font-medium mt-1">Profil</span>
-              </div>
+              {/* Profile/Auth Links */}
+              {loading ? null : currentUser ? (
+                <Link href="/profile">
+                  <div className={`relative flex flex-col items-center group cursor-pointer ${isActive('/profile') ? 'text-accent-primary' : 'text-gray-400'}`}>
+                    <div className="p-2 rounded-xl transition-all duration-300 group-hover:bg-white/5">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-medium mt-1">Profil</span>
+                    {isActive('/profile') && (
+                      <motion.div
+                        layoutId="navIndicator"
+                        className="absolute -bottom-2 w-1 h-1 bg-accent-primary rounded-full"
+                      />
+                    )}
+                  </div>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <div className={`relative flex flex-col items-center group cursor-pointer ${isActive('/login') ? 'text-accent-primary' : 'text-gray-400'}`}>
+                    <div className="p-2 rounded-xl transition-all duration-300 group-hover:bg-white/5">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-medium mt-1">Přihlásit</span>
+                  </div>
+                </Link>
+              )}
 
             </div>
           </div>

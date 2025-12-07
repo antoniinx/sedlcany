@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { routes } from '../../data/routes';
 import Quiz from '../../components/Quiz';
 import ElevationProfile from '../../components/ElevationProfile';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Map = dynamic(() => import('../../components/Map'), { ssr: false });
 
@@ -19,6 +20,7 @@ export default function RoutePage() {
   const [trailPoints, setTrailPoints] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const { updateUserProgress } = useAuth();
 
   useEffect(() => {
     if (id) {
@@ -45,17 +47,15 @@ export default function RoutePage() {
       setIsCompleted(true);
       setShowCompletion(true);
 
-      const completedRoutes = JSON.parse(localStorage.getItem('completedRoutes') || '{}');
       const correctCount = newAnswers.filter((a) => a.isCorrect).length;
       const successRate = Math.round((correctCount / route.questions.length) * 100);
+      const pointsEarned = trailPoints + (isCorrect ? route.questions[currentQuestionIndex].points : 0);
 
-      completedRoutes[route.id] = {
-        completed: true,
+      // Save via Context
+      updateUserProgress(route.id, pointsEarned, {
         successRate,
-        points: trailPoints + (isCorrect ? route.questions[currentQuestionIndex].points : 0),
-        completedAt: new Date().toISOString()
-      };
-      localStorage.setItem('completedRoutes', JSON.stringify(completedRoutes));
+        points: pointsEarned
+      });
     }
   };
 
@@ -90,8 +90,8 @@ export default function RoutePage() {
             </Link>
             <div className="flex items-center space-x-2">
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 border border-white/10 ${route.difficulty === 'Lehká' ? 'text-green-400' :
-                  route.difficulty === 'Střední' ? 'text-yellow-400' :
-                    'text-red-400'
+                route.difficulty === 'Střední' ? 'text-yellow-400' :
+                  'text-red-400'
                 }`}>
                 {route.difficulty}
               </span>

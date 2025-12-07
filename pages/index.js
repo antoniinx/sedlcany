@@ -8,9 +8,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    if (!localStorage.getItem('totalPoints')) {
-      localStorage.setItem('totalPoints', '0');
-    }
   }, []);
 
   if (!mounted) return null;
